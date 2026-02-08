@@ -12,10 +12,7 @@ import { uploadFile } from '../api/files';
 import { createVoice } from '../api/voices';
 import AudioRecorder from '../components/AudioRecorder';
 import AudioWaveform from '../components/AudioWaveform';
-<<<<<<< HEAD
 import VoiceNFTMint from '../components/VoiceNFTMint';
-=======
->>>>>>> e8548398ef89955d6656af77ab63fdb59e16ed33
 import { theme } from '../styles/theme';
 
 type ProcessingStep = 'upload' | 'processing' | 'complete';

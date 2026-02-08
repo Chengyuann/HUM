@@ -117,11 +117,7 @@ const Layout = ({ children }: LayoutProps) => {
         fontSize: '14px',
         fontWeight: 500,
       }}>
-<<<<<<< HEAD
-        <div style={{ marginBottom: '8px' }}>本周之声 ©2024</div>
-=======
         <div style={{ marginBottom: '8px' }}>HUM｜人声余温 ©2024</div>
->>>>>>> e8548398ef89955d6656af77ab63fdb59e16ed33
         <div style={{ fontSize: '12px', color: '#95A5A6' }}>
           用声音创造无限可能
         </div>

@@ -82,12 +82,11 @@ const Home = () => {
           本周之声
         </h1>
         <p style={{ 
-          margin: 0, 
+          margin: '0 auto',
           fontSize: '18px', 
           color: '#636E72',
           lineHeight: '1.6',
           maxWidth: '600px',
-          margin: '0 auto',
         }}>
           探索独特的语音角色，创造属于你的声音世界
         </p>
