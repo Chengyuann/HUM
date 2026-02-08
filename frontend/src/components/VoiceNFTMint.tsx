@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, message, Card, Typography, Tabs, Input, Form, Divider, Descriptions, Space } from 'antd';
+import { Button, message, Card, Typography, Tabs, Input, Divider, Descriptions, Space } from 'antd';
 import { ethers } from 'ethers';
 import VoiceNFTArtifact from '../contracts/VoiceNFT.json';
 import { VOICE_NFT_ADDRESS, CHAIN_ID, CHAIN_CONFIG } from '../config/web3';
@@ -81,19 +81,14 @@ const VoiceNFTMint: React.FC<VoiceNFTMintProps> = ({ voiceId, embeddingHash }) =
         gasLimit: 500000 // Manually set gas limit to avoid estimation errors on testnet
       });
       message.info("Transaction submitted: " + tx.hash);
-<<<<<<< HEAD
-      
-      const receipt = await tx.wait();
-=======
 
-      await tx.wait();
->>>>>>> 50c77b430dc5d3f3007131db70e99aaa52de4cd6
+      const receipt = await tx.wait();
       setTxHash(tx.hash);
 
       // Find Token ID from logs
       // Event: Transfer(address indexed from, address indexed to, uint256 indexed tokenId)
       // topic[0] is hash, topic[1] is from, topic[2] is to, topic[3] is tokenId
-      const transferLog = receipt.logs.find((log: any) => 
+      const transferLog = receipt?.logs.find((log: any) => 
         log.address.toLowerCase() === VOICE_NFT_ADDRESS.toLowerCase() && log.topics.length === 4
       );
 
@@ -119,174 +114,124 @@ const VoiceNFTMint: React.FC<VoiceNFTMintProps> = ({ voiceId, embeddingHash }) =
     }
   };
 
-<<<<<<< HEAD
   const handleFetchData = async () => {
     if (!tokenIdToManage) {
-        message.warning("Please enter a Token ID");
+        message.error("Please enter a Token ID");
         return;
     }
     setLoading(true);
+    setRetrievedData(null);
     try {
         const { signer } = await getProviderAndSigner();
         const contract = new ethers.Contract(VOICE_NFT_ADDRESS, VoiceNFTArtifact.abi, signer);
         
         // Call getVoiceData
-        const [rVoiceId, rEmbeddingHash] = await contract.getVoiceData(tokenIdToManage);
-        setRetrievedData({ voiceId: rVoiceId, embeddingHash: rEmbeddingHash });
-        message.success("Data retrieved from 0G Chain!");
+        const data = await contract.getVoiceData(tokenIdToManage);
+        // data is [voiceId, embeddingHash]
+        setRetrievedData({
+            voiceId: data[0],
+            embeddingHash: data[1]
+        });
+        message.success("Voice Data Retrieved!");
     } catch (error: any) {
         console.error(error);
-        message.error("Fetch failed: " + (error.reason || error.message));
-        setRetrievedData(null);
+        message.error("Failed to fetch data: " + (error.reason || error.message));
     } finally {
         setLoading(false);
     }
   };
 
   const handleTransfer = async () => {
-      if (!tokenIdToManage || !recipientAddress) {
-          message.warning("Please enter Token ID and Recipient Address");
-          return;
-      }
+      if (!tokenIdToManage || !recipientAddress) return;
       setLoading(true);
       try {
-        const { signer } = await getProviderAndSigner();
-        const contract = new ethers.Contract(VOICE_NFT_ADDRESS, VoiceNFTArtifact.abi, signer);
-        const userAddress = await signer.getAddress();
-
-        // safeTransferFrom is overloaded, so we use the function signature
-        // Note: In ethers v6, we can try using the method name if unique or the typed way
-        // "safeTransferFrom(address,address,uint256)"
-        
-        const tx = await contract["safeTransferFrom(address,address,uint256)"](userAddress, recipientAddress, tokenIdToManage);
-        message.info("Transfer initiated: " + tx.hash);
-        await tx.wait();
-        message.success("NFT Transferred Successfully!");
-        setRecipientAddress('');
+          const { signer } = await getProviderAndSigner();
+          const contract = new ethers.Contract(VOICE_NFT_ADDRESS, VoiceNFTArtifact.abi, signer);
+          
+          // Use transferFrom. Note: safeTransferFrom is overloaded in ethers, simpler to use transferFrom or specifically select the function.
+          // Using transferFrom(from, to, tokenId)
+          const tx = await contract.transferFrom(await signer.getAddress(), recipientAddress, tokenIdToManage, {
+              gasLimit: 300000
+          });
+          message.info("Transfer started: " + tx.hash);
+          await tx.wait();
+          message.success("Transfer successful!");
       } catch (error: any) {
-        console.error(error);
-        message.error("Transfer failed: " + (error.reason || error.message));
+          console.error(error);
+          message.error("Transfer failed: " + (error.reason || error.message));
       } finally {
-        setLoading(false);
+          setLoading(false);
       }
   };
 
   const items = [
     {
       key: '1',
-      label: 'Mint New NFT',
+      label: 'Mint New',
       children: (
-        <div style={{ padding: '10px 0' }}>
-            <div style={{ marginBottom: 16 }}>
-                <Text strong>Voice ID:</Text> <Text code>{voiceId}</Text>
-                <br />
-                <Text strong>Embedding Hash:</Text> <Text code>{embeddingHash}</Text>
+        <>
+            <h3 style={{ margin: '0 0 24px 0', fontSize: '18px', fontWeight: 600, color: '#2C3E50' }}>
+                Mint Voice NFT on 0G Testnet
+            </h3>
+            
+            <div style={{ marginBottom: 24 }}>
+                <div style={{ marginBottom: 12 }}>
+                <span style={{ fontSize: '13px', color: '#6C757D', fontWeight: 500 }}>Voice ID</span>
+                <div style={{ 
+                    marginTop: 4,
+                    padding: '8px 12px',
+                    background: '#F8F9FA',
+                    borderRadius: '6px',
+                    fontFamily: 'monospace',
+                    fontSize: '13px',
+                    color: '#2C3E50',
+                    wordBreak: 'break-all',
+                }}>
+                    {voiceId}
+                </div>
+                </div>
+                
+                <div>
+                <span style={{ fontSize: '13px', color: '#6C757D', fontWeight: 500 }}>Embedding Hash</span>
+                <div style={{ 
+                    marginTop: 4,
+                    padding: '8px 12px',
+                    background: '#F8F9FA',
+                    borderRadius: '6px',
+                    fontFamily: 'monospace',
+                    fontSize: '13px',
+                    color: '#2C3E50',
+                    wordBreak: 'break-all',
+                }}>
+                    {embeddingHash}
+                </div>
+                </div>
             </div>
-            <Button type="primary" onClick={handleMint} loading={loading}>
+            
+            <Button 
+                type="primary" 
+                onClick={handleMint} 
+                loading={loading}
+                size="large"
+                style={{ height: '48px', borderRadius: '8px', fontWeight: 500 }}
+            >
                 Mint NFT
             </Button>
+            
             {txHash && (
-                <div style={{ marginTop: 20 }}>
-                    <Text type="success">Minted Successfully!</Text>
-                    <br/>
-                    {mintedTokenId && <Text strong style={{ fontSize: 16 }}>Token ID: {mintedTokenId}</Text>}
-                    <br/>
-                    <a href={`${CHAIN_CONFIG.blockExplorerUrls[0]}/tx/${txHash}`} target="_blank" rel="noopener noreferrer">
-                        View on Explorer
-                    </a>
+                <div style={{ marginTop: 20, padding: '16px', background: '#F8F9FA', borderRadius: '8px' }}>
+                <span style={{ color: '#27AE60', fontWeight: 500, fontSize: '14px' }}>Minted Successfully! </span>
+                <a 
+                    href={`${CHAIN_CONFIG.blockExplorerUrls[0]}/tx/${txHash}`} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    style={{ color: '#3498DB', textDecoration: 'none', fontSize: '14px' }}
+                >   
+                    View on Explorer →
+                </a>
                 </div>
             )}
-=======
-  return (
-    <Card 
-      bordered={false}
-      style={{ 
-        marginTop: 32,
-        background: '#FFFFFF',
-        borderRadius: '12px',
-        boxShadow: '0 1px 3px rgba(44, 62, 80, 0.08)',
-      }}
-      bodyStyle={{ padding: '32px' }}
-    >
-      <h3 style={{ 
-        margin: '0 0 24px 0', 
-        fontSize: '18px', 
-        fontWeight: 600,
-        color: '#2C3E50',
-      }}>
-        Mint Voice NFT on 0G Testnet
-      </h3>
-      
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ marginBottom: 12 }}>
-          <span style={{ fontSize: '13px', color: '#6C757D', fontWeight: 500 }}>Voice ID</span>
-          <div style={{ 
-            marginTop: 4,
-            padding: '8px 12px',
-            background: '#F8F9FA',
-            borderRadius: '6px',
-            fontFamily: 'monospace',
-            fontSize: '13px',
-            color: '#2C3E50',
-            wordBreak: 'break-all',
-          }}>
-            {voiceId}
-          </div>
-        </div>
-        
-        <div>
-          <span style={{ fontSize: '13px', color: '#6C757D', fontWeight: 500 }}>Embedding Hash</span>
-          <div style={{ 
-            marginTop: 4,
-            padding: '8px 12px',
-            background: '#F8F9FA',
-            borderRadius: '6px',
-            fontFamily: 'monospace',
-            fontSize: '13px',
-            color: '#2C3E50',
-            wordBreak: 'break-all',
-          }}>
-            {embeddingHash}
-          </div>
-        </div>
-      </div>
-      
-      <Button 
-        type="primary" 
-        onClick={handleMint} 
-        loading={loading}
-        size="large"
-        style={{ 
-          height: '48px',
-          borderRadius: '8px',
-          fontWeight: 500,
-        }}
-      >
-        Mint NFT
-      </Button>
-      
-      {txHash && (
-        <div style={{ 
-          marginTop: 20,
-          padding: '16px',
-          background: '#F8F9FA',
-          borderRadius: '8px',
-        }}>
-          <span style={{ color: '#27AE60', fontWeight: 500, fontSize: '14px' }}>Minted Successfully! </span>
-          <a 
-            href={`${CHAIN_CONFIG.blockExplorerUrls[0]}/tx/${txHash}`} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            style={{ 
-              color: '#3498DB',
-              textDecoration: 'none',
-              fontSize: '14px',
-            }}
-          >   
-            View on Explorer →
-          </a>
->>>>>>> 50c77b430dc5d3f3007131db70e99aaa52de4cd6
-        </div>
+        </>
       ),
     },
     {
@@ -342,7 +287,16 @@ const VoiceNFTMint: React.FC<VoiceNFTMintProps> = ({ voiceId, embeddingHash }) =
   ];
 
   return (
-    <Card title="0G Voice NFT Manager" style={{ marginTop: 20 }}>
+    <Card 
+      bordered={false}
+      style={{ 
+        marginTop: 32,
+        background: '#FFFFFF',
+        borderRadius: '12px',
+        boxShadow: '0 1px 3px rgba(44, 62, 80, 0.08)',
+      }}
+      bodyStyle={{ padding: '32px' }}
+    >
       <Tabs defaultActiveKey="1" items={items} />
     </Card>
   );

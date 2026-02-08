@@ -12,11 +12,8 @@ import { uploadFile } from '../api/files';
 import { createVoice } from '../api/voices';
 import AudioRecorder from '../components/AudioRecorder';
 import AudioWaveform from '../components/AudioWaveform';
-<<<<<<< HEAD
 import VoiceNFTMint from '../components/VoiceNFTMint';
-=======
 import { theme } from '../styles/theme';
->>>>>>> 50c77b430dc5d3f3007131db70e99aaa52de4cd6
 
 type ProcessingStep = 'upload' | 'processing' | 'complete';
 
@@ -366,11 +363,10 @@ const CreateVoice = () => {
                   </div>
                 )}
 
-<<<<<<< HEAD
-                <VoiceNFTMint voiceId={voiceResult.voiceId} embeddingHash={voiceResult.embeddingHash} />
+                <div style={{ marginTop: theme.spacing.md }}>
+                   <VoiceNFTMint voiceId={voiceResult.voiceId} embeddingHash={voiceResult.embeddingHash} />
+                </div>
 
-                <Button type="primary" onClick={handleReset} block>
-=======
                 <Button 
                   type="primary" 
                   onClick={handleReset} 
@@ -385,7 +381,6 @@ const CreateVoice = () => {
                     marginTop: theme.spacing.md,
                   }}
                 >
->>>>>>> 50c77b430dc5d3f3007131db70e99aaa52de4cd6
                   创建新角色
                 </Button>
               </Space>
@@ -398,6 +393,3 @@ const CreateVoice = () => {
 };
 
 export default CreateVoice;
-
-
-
