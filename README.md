@@ -143,8 +143,9 @@ flowchart TB
 ## 五、技术要点 · Key Technical Decisions
 
 ### 🧠 录音去噪（阶段一）
+<img width="1218" height="201" alt="image" src="https://github.com/user-attachments/assets/bb3728c7-8550-4a8d-bc5a-5fef39994d66" />
 
-使用ClearerVoice最先进的预训练模型进行语音去噪
+我们使用ClearerVoice最先进的预训练模型进行语音去噪。
 
 ### 🧠 Embedding 设计（阶段二）
 
