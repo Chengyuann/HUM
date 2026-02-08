@@ -135,6 +135,9 @@ flowchart TB
     EmbedSvc --> DB
     API --> Cache
 
+```
+
+
 ---
 
 ## 五、技术要点 · Key Technical Decisions
