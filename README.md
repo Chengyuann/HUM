@@ -1,5 +1,5 @@
 
-# 🎙 Voices — 情感人格化语音平台  
+# 🎙 HUM｜人声余温
 **Where voices are not just heard, but remembered.**
 
 ---
