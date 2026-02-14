@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@coinbase/x402": "^2.1.0",
     "axios": "^1.7.9",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
@@ -20,7 +21,8 @@
     "multer": "^1.4.5-lts.1",
     "pg": "^8.13.1",
     "redis": "^4.7.0",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "x402-express": "^1.1.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

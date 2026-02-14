@@ -40,6 +40,7 @@ const Layout = ({ children }: LayoutProps) => {
       <Header 
         style={{ 
           display: 'flex', 
+          justifyContent: 'center',
           alignItems: 'center', 
           background: 'rgba(253, 252, 251, 0.95)',
           backdropFilter: 'blur(12px)',
@@ -52,32 +53,37 @@ const Layout = ({ children }: LayoutProps) => {
           boxShadow: '0 2px 16px rgba(131, 182, 146, 0.08)',
         }}
       >
-        <div style={{ 
-          fontFamily: '"Fraunces", Georgia, serif',
-          color: '#2D3436', 
-          fontSize: '28px', 
-          fontWeight: 700,
-          marginRight: '72px',
-          letterSpacing: '-0.5px',
-          background: 'linear-gradient(135deg, #83B692 0%, #6B9A7A 100%)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text',
-        }}>
-          HUM｜人声余温
+        <div style={{ width: '100%', maxWidth: '1200px', display: 'flex', alignItems: 'center', position: 'relative', justifyContent: 'center' }}>
+          <div style={{ 
+            fontFamily: '"Fraunces", Georgia, serif',
+            color: '#2D3436', 
+            fontSize: '28px', 
+            fontWeight: 700,
+            letterSpacing: '-0.5px',
+            background: 'linear-gradient(135deg, #83B692 0%, #6B9A7A 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            whiteSpace: 'nowrap',
+            position: 'absolute',
+            left: 0,
+          }}>
+            HUM｜人声余温
+          </div>
+          <Menu
+            mode="horizontal"
+            selectedKeys={[location.pathname]}
+            items={menuItems}
+            style={{ 
+              minWidth: '600px',
+              border: 'none',
+              background: 'transparent',
+              fontSize: '15px',
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          />
         </div>
-        <Menu
-          mode="horizontal"
-          selectedKeys={[location.pathname]}
-          items={menuItems}
-          style={{ 
-            flex: 1, 
-            minWidth: 0, 
-            border: 'none',
-            background: 'transparent',
-            fontSize: '15px',
-          }}
-        />
       </Header>
       
       <Content style={{ 
@@ -85,6 +91,8 @@ const Layout = ({ children }: LayoutProps) => {
         background: 'transparent',
         minHeight: 'calc(100vh - 160px)',
         position: 'relative',
+        display: 'flex',
+        justifyContent: 'center',
       }}>
         {/* Decorative organic blobs */}
         <div className="organic-blob" style={{
@@ -93,6 +101,11 @@ const Layout = ({ children }: LayoutProps) => {
           background: 'linear-gradient(135deg, #83B692 0%, #A5C9B3 100%)',
           top: '-200px',
           right: '-200px',
+          position: 'absolute',
+          borderRadius: '40% 60% 70% 30% / 40% 50% 60% 50%',
+          filter: 'blur(80px)',
+          opacity: 0.1,
+          zIndex: 0,
         }} />
         <div className="organic-blob" style={{
           width: '400px',
@@ -100,9 +113,14 @@ const Layout = ({ children }: LayoutProps) => {
           background: 'linear-gradient(135deg, #D4A574 0%, #E8A87C 100%)',
           bottom: '-100px',
           left: '-100px',
+          position: 'absolute',
+          borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%',
+          filter: 'blur(60px)',
+          opacity: 0.1,
+          zIndex: 0,
         }} />
         
-        <div style={{ maxWidth: '1400px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
+        <div style={{ width: '100%', maxWidth: '1200px', zIndex: 1 }}>
           {children}
         </div>
       </Content>

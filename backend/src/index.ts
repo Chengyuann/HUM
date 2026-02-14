@@ -1,13 +1,11 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import path from 'path';
 import fileRoutes from './routes/files';
 import voiceRoutes from './routes/voices';
 import ttsRoutes from './routes/tts';
 import embeddingRoutes from './routes/embeddings';
-
-dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 8000;

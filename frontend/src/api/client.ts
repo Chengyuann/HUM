@@ -1,6 +1,21 @@
 import axios from 'axios';
+// @ts-ignore
+import { withPaymentInterceptor } from 'x402-axios';
+import { createWalletClient, custom } from 'viem';
+import { baseSepolia, sepolia, polygonAmoy, arbitrumSepolia } from 'viem/chains';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
+const X402_NETWORK = import.meta.env.VITE_X402_NETWORK || 'base-sepolia';
+
+// Map network names to viem chain objects
+const CHAIN_MAP: Record<string, any> = {
+  'base-sepolia': baseSepolia,
+  'sepolia': sepolia,
+  'polygon-amoy': polygonAmoy,
+  'arbitrum-sepolia': arbitrumSepolia,
+};
+
+const targetChain = CHAIN_MAP[X402_NETWORK] || baseSepolia;
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -9,6 +24,22 @@ const apiClient = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+// Setup X402 Payment Interceptor
+if (typeof window !== 'undefined' && (window as any).ethereum) {
+  try {
+    const walletClient = createWalletClient({
+      chain: baseSepolia,
+      transport: custom((window as any).ethereum)
+    });
+
+    // Add X402 interceptor
+    withPaymentInterceptor(apiClient, walletClient);
+    console.log('X402 Payment Interceptor configured');
+  } catch (err) {
+    console.warn('Failed to setup X402 interceptor:', err);
+  }
+}
 
 // 请求拦截器
 apiClient.interceptors.request.use(

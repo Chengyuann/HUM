@@ -52,9 +52,9 @@ router.post('/upload', upload.single('file'), async (req: Request, res: Response
     const duration = await audioPreprocessor.getDuration(processedFile.path);
 
     // 校验时长
-    if (duration < 1 || duration > 10) {
+    if (duration < 1 || duration > 60) {
       await fs.unlink(processedFile.path);
-      return sendError(res, '音频时长必须在1-10秒之间', 400);
+      return sendError(res, '音频时长必须在1-60秒之间', 400);
     }
 
     // 保存文件信息（不上传到 StepFun，使用本地存储）
