@@ -1,13 +1,17 @@
 import { useEffect, useState } from 'react';
-import { Card, List, Button, Popconfirm, message, Empty } from 'antd';
-import { DeleteOutlined, PlayCircleOutlined } from '@ant-design/icons';
-import { listVoices, deleteVoice, type Voice } from '../api/voices';
+import { Card, List, Button, Popconfirm, message, Empty, Typography, Input, Space } from 'antd';
+import { DeleteOutlined, PlayCircleOutlined, EditOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
+import { listVoices, deleteVoice, updateVoice, type Voice } from '../api/voices';
 import { useNavigate } from 'react-router-dom';
 import { theme } from '../styles/theme';
+
+const { Text } = Typography;
 
 const MyVoices = () => {
   const [voices, setVoices] = useState<Voice[]>([]);
   const [loading, setLoading] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
   const navigate = useNavigate();
 
   const loadVoices = async () => {
@@ -15,7 +19,6 @@ const MyVoices = () => {
     try {
       const response = await listVoices();
       if (response.success) {
-        // 这里应该过滤当前用户的voices，暂时显示所有
         setVoices(response.data.voices);
       }
     } catch (error) {
@@ -23,6 +26,34 @@ const MyVoices = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleUpdateName = async (voiceId: string) => {
+    if (!editName.trim()) {
+      message.error('角色名称不能为空');
+      return;
+    }
+
+    try {
+      const response = await updateVoice(voiceId, { name: editName.trim() });
+      if (response.success) {
+        message.success('更新成功');
+        setEditingId(null);
+        loadVoices();
+      }
+    } catch (error: any) {
+      message.error(error.message || '更新失败');
+    }
+  };
+
+  const startEditing = (voice: Voice) => {
+    setEditingId(voice.id);
+    setEditName(voice.name || '');
+  };
+
+  const cancelEditing = () => {
+    setEditingId(null);
+    setEditName('');
   };
 
   useEffect(() => {
@@ -105,6 +136,35 @@ const MyVoices = () => {
               border: `1px solid ${theme.colors.sage}20`,
             }}
             actions={[
+              editingId === voice.id ? (
+                <Space key="edit-actions">
+                  <Button
+                    type="link"
+                    icon={<CheckOutlined />}
+                    onClick={() => handleUpdateName(voice.id)}
+                    style={{ color: theme.colors.sage }}
+                  >
+                    保存
+                  </Button>
+                  <Button
+                    type="link"
+                    icon={<CloseOutlined />}
+                    onClick={cancelEditing}
+                    style={{ color: theme.colors.mutedText }}
+                  >
+                    取消
+                  </Button>
+                </Space>
+              ) : (
+                <Button
+                  type="link"
+                  icon={<EditOutlined />}
+                  onClick={() => startEditing(voice)}
+                  style={{ color: theme.colors.sage }}
+                >
+                  重命名
+                </Button>
+              ),
               <Button
                 type="link"
                 icon={<PlayCircleOutlined />}
@@ -135,14 +195,28 @@ const MyVoices = () => {
           >
             <List.Item.Meta
               title={
-                <span style={{ 
-                  fontSize: '16px',
-                  fontWeight: 600,
-                  color: theme.colors.charcoal,
-                  fontFamily: theme.typography.display,
-                }}>
-                  Voice {voice.id.slice(0, 8)}...
-                </span>
+                editingId === voice.id ? (
+                  <Input
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    onPressEnter={() => handleUpdateName(voice.id)}
+                    autoFocus
+                    style={{ 
+                      fontFamily: theme.typography.display,
+                      fontWeight: 600,
+                      fontSize: '16px',
+                    }}
+                  />
+                ) : (
+                  <span style={{ 
+                    fontSize: '16px',
+                    fontWeight: 600,
+                    color: theme.colors.charcoal,
+                    fontFamily: theme.typography.display,
+                  }}>
+                    {voice.name || `Voice ${voice.id.slice(0, 8)}...`}
+                  </span>
+                )
               }
               description={
                 <div style={{ 

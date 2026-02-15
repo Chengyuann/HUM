@@ -352,7 +352,7 @@ const Home = () => {
                     color: '#2D3436',
                     letterSpacing: '-0.3px',
                   }}>
-                    Voice {voice.id.slice(0, 8)}
+                    {voice.name || `Voice ${voice.id.slice(0, 8)}`}
                   </h3>
                   
                   <div style={{ 

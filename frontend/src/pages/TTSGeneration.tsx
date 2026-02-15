@@ -330,12 +330,12 @@ const TTSGeneration = () => {
               placeholder="请选择语音角色"
               showSearch
               filterOption={(input, option) =>
-                (option?.children as string)?.toLowerCase().includes(input.toLowerCase())
+                (option?.label as string)?.toLowerCase().includes(input.toLowerCase())
               }
             >
               {voices.map((voice) => (
-                <Option key={voice.id} value={voice.id}>
-                  {voice.id.slice(0, 8)}... ({voice.model})
+                <Option key={voice.id} value={voice.id} label={voice.name || voice.id}>
+                  {voice.name || `Voice ${voice.id.slice(0, 8)}...`} ({voice.model})
                 </Option>
               ))}
             </Select>

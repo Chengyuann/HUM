@@ -24,6 +24,7 @@ export class VoiceService {
     userId: string,
     fileId: string,
     model: string,
+    name?: string,
     text?: string,
     sampleText?: string
   ): Promise<Voice> {
@@ -48,6 +49,7 @@ export class VoiceService {
     const voice: Voice = {
       id: voiceId,
       userId,
+      name: name || undefined,
       stepVoiceId: `local-${voiceId}`, // 本地生成的 ID
       fileId,
       model: model || 'codec',
@@ -90,6 +92,9 @@ export class VoiceService {
 
     if (data.text !== undefined) {
       voice.text = data.text;
+    }
+    if (data.name !== undefined) {
+      voice.name = data.name;
     }
     if (data.metadata !== undefined) {
       voice.metadata = data.metadata;

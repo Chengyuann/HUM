@@ -6,8 +6,9 @@ import {
   Progress,
   message,
   Space,
+  Input,
 } from 'antd';
-import { UploadOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { UploadOutlined, CheckCircleOutlined, UserOutlined } from '@ant-design/icons';
 import { uploadFile } from '../api/files';
 import { createVoice } from '../api/voices';
 import AudioRecorder from '../components/AudioRecorder';
@@ -19,6 +20,7 @@ type ProcessingStep = 'upload' | 'processing' | 'complete';
 
 const CreateVoice = () => {
   const [file, setFile] = useState<File | null>(null);
+  const [voiceName, setVoiceName] = useState('');
   const [uploadProgress, setUploadProgress] = useState(0);
   const [processing, setProcessing] = useState(false);
   const [currentStep, setCurrentStep] = useState<ProcessingStep>('upload');
@@ -66,6 +68,7 @@ const CreateVoice = () => {
 
       const voiceResponse = await createVoice({
         fileId: uploadResponse.data.fileId,
+        name: voiceName.trim() || undefined,
         model: 'codec',
       });
 
@@ -84,6 +87,7 @@ const CreateVoice = () => {
 
   const handleReset = () => {
     setFile(null);
+    setVoiceName('');
     setVoiceResult(null);
     setCurrentStep('upload');
     setUploadProgress(0);
@@ -122,6 +126,35 @@ const CreateVoice = () => {
         </p>
 
         <Space direction="vertical" size={theme.spacing.xl} style={{ width: '100%' }}>
+          {/* Name Input Section */}
+          <div>
+            <div style={{ 
+              marginBottom: theme.spacing.md, 
+              fontSize: '14px', 
+              fontWeight: 600, 
+              color: theme.colors.charcoal,
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+            }}>
+              角色名称
+            </div>
+            <Input
+              placeholder="为你的语音角色起个名字（可选）"
+              value={voiceName}
+              onChange={(e) => setVoiceName(e.target.value)}
+              disabled={processing}
+              size="large"
+              prefix={<UserOutlined style={{ color: theme.colors.mutedText }} />}
+              style={{ 
+                borderRadius: theme.borderRadius.medium, 
+                height: '56px', 
+                fontSize: '16px',
+                border: `1px solid ${theme.colors.sage}30`,
+                background: theme.colors.warmWhite,
+              }}
+            />
+          </div>
+
           {/* Upload Section */}
           <div>
             <div style={{ 
@@ -298,6 +331,29 @@ const CreateVoice = () => {
               </div>
 
               <Space direction="vertical" size={theme.spacing.lg} style={{ width: '100%' }}>
+                <div>
+                  <div style={{ 
+                    fontSize: '13px', 
+                    color: theme.colors.mutedText, 
+                    marginBottom: theme.spacing.sm,
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                  }}>角色名称</div>
+                  <div style={{ 
+                    padding: theme.spacing.md, 
+                    background: theme.colors.warmWhite, 
+                    borderRadius: theme.borderRadius.small,
+                    fontFamily: theme.typography.body,
+                    fontSize: '16px',
+                    fontWeight: 600,
+                    color: theme.colors.charcoal,
+                    wordBreak: 'break-all',
+                    border: `1px solid ${theme.colors.sage}30`,
+                  }}>
+                    {voiceResult.name || '未命名角色'}
+                  </div>
+                </div>
+
                 <div>
                   <div style={{ 
                     fontSize: '13px', 

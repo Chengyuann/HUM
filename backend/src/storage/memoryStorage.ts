@@ -25,6 +25,7 @@ interface Embedding {
 interface Voice {
   id: string;
   userId: string;
+  name?: string;
   stepVoiceId: string;
   fileId: string;
   model: string;

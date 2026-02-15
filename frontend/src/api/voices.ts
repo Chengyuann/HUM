@@ -2,6 +2,7 @@ import apiClient from './client';
 
 export interface CreateVoiceRequest {
   fileId: string;
+  name?: string;
   text?: string;
   sampleText?: string;
   model: string;
@@ -11,6 +12,7 @@ export interface VoiceResponse {
   success: boolean;
   data: {
     voiceId: string;
+    name?: string;
     stepVoiceId: string;
     sampleAudio: string; // base64
     embeddingHash: string;
@@ -22,6 +24,7 @@ export interface VoiceResponse {
 export interface Voice {
   id: string;
   userId: string;
+  name?: string;
   stepVoiceId: string;
   fileId: string;
   model: string;

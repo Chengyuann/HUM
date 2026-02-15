@@ -7,14 +7,14 @@ const router = express.Router();
 // 创建音色
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const { fileId, text, sampleText, model } = req.body;
+    const { fileId, text, sampleText, model, name } = req.body;
 
     if (!fileId || !model) {
       return sendError(res, 'fileId和model是必填项', 400);
     }
 
     const userId = (req as any).userId || 'default-user';
-    const voice = await voiceService.createVoice(userId, fileId, model, text, sampleText);
+    const voice = await voiceService.createVoice(userId, fileId, model, name, text, sampleText);
 
     // 读取sample音频（如果存在）
     let sampleAudio: string | undefined;
