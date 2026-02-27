@@ -31,7 +31,15 @@ const AudioRecorder = ({ onRecordComplete }: AudioRecorderProps) => {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
 
-      const mediaRecorder = new MediaRecorder(stream);
+      // 按优先级选取浏览器支持的 mimeType（Chrome/Edge 兼容）
+      const PREFERRED_MIME_TYPES = [
+        'audio/webm;codecs=opus',
+        'audio/webm',
+        'audio/ogg;codecs=opus',
+        'audio/mp4',
+      ];
+      const mimeType = PREFERRED_MIME_TYPES.find((t) => MediaRecorder.isTypeSupported(t)) || '';
+      const mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
       chunksRef.current = [];
 
@@ -44,14 +52,16 @@ const AudioRecorder = ({ onRecordComplete }: AudioRecorderProps) => {
       mediaRecorder.onstop = async () => {
         setProcessing(true);
         try {
-          const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
+          // 使用 recorder 实际的 mimeType，避免 Chrome/Edge 解码失败
+          const actualMimeType = mediaRecorderRef.current?.mimeType || 'audio/webm';
+          const blob = new Blob(chunksRef.current, { type: actualMimeType });
           
           // Convert to WAV
           const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
           const arrayBuffer = await blob.arrayBuffer();
           const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
           const wavBlob = audioBufferToWav(audioBuffer);
-          
           const file = new File([wavBlob], `recording-${Date.now()}.wav`, { type: 'audio/wav' });
           onRecordComplete(file);
         } catch (error) {

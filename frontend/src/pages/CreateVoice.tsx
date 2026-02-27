@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Card,
   Upload,
@@ -84,6 +84,12 @@ const CreateVoice = () => {
       setProcessing(false);
     }
   };
+
+  const filePreviewUrl = useMemo(() => {
+    if (!file) return null;
+    const url = URL.createObjectURL(file);
+    return url;
+  }, [file]);
 
   const handleReset = () => {
     setFile(null);
@@ -238,6 +244,13 @@ const CreateVoice = () => {
                   </span>
                 </div>
                 <AudioWaveform file={file} />
+                {filePreviewUrl && (
+                  <audio
+                    controls
+                    src={filePreviewUrl}
+                    style={{ width: '100%', marginTop: theme.spacing.sm }}
+                  />
+                )}
               </div>
             )}
 

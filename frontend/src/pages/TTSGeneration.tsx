@@ -11,7 +11,7 @@ const { Option } = Select;
 const TTSGeneration = () => {
   const [voices, setVoices] = useState<Voice[]>([]);
   const [selectedVoiceId, setSelectedVoiceId] = useState<string>('');
-  const [model, setModel] = useState('step-tts-mini');
+  const [model, setModel] = useState('cosyvoice-v3-plus');
   const [inputText, setInputText] = useState('');
   const [generating, setGenerating] = useState(false);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
@@ -248,7 +248,7 @@ const TTSGeneration = () => {
                   color: theme.colors.sage,
                   fontWeight: 600,
                   fontFamily: theme.typography.mono,
-                }}>step-tts-2</div>
+                }}>cosyvoice-v3-plus</div>
               </div>
               
               <div style={{ marginBottom: theme.spacing.lg }}>
@@ -352,16 +352,13 @@ const TTSGeneration = () => {
             }}>
               模型选择
             </div>
-            <Select 
-              value={model} 
-              onChange={setModel} 
+            <Select
+              value={model}
+              onChange={setModel}
               style={{ width: '100%' }}
               size="large"
             >
-              <Option value="step-tts-2">step-tts-2</Option>
-              <Option value="step-tts-mini">step-tts-mini</Option>
-              <Option value="step-tts-vivid">step-tts-vivid</Option>
-              <Option value="step-audio-2">step-audio-2</Option>
+              <Option value="cosyvoice-v3-plus">cosyvoice-v3-plus（推荐）</Option>
             </Select>
           </div>
 

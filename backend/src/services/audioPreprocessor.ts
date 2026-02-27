@@ -36,7 +36,8 @@ export class AudioPreprocessor {
       };
     }
 
-    // 使用ffmpeg处理音频
+    // 只做格式/采样率/声道转换，不做动态压缩
+    // dynaudnorm 会拉平噪音导致 DashScope VAD 误判，故移除
     const ffmpegCommand = `ffmpeg -i "${inputPath}" -ar 16000 -ac 1 -y "${outputPath}"`;
     
     try {
@@ -84,6 +85,42 @@ export class AudioPreprocessor {
     } catch (error) {
       console.error('Failed to get audio duration:', error);
       return 0;
+    }
+  }
+
+  /**
+   * 检测音频是否包含有效人声内容
+   * 用 ffmpeg volumedetect 分析最大音量，低于阈值视为静音
+   * max_volume < -30dB 基本是环境噪音，不含语音
+   */
+  async checkVoiceContent(audioPath: string): Promise<void> {
+    try {
+      await execAsync('ffmpeg -version');
+    } catch {
+      return; // 没有 ffmpeg 跳过检测
+    }
+
+    // Windows 上用 NUL，Linux/macOS 用 /dev/null
+    const nullDevice = process.platform === 'win32' ? 'NUL' : '/dev/null';
+
+    try {
+      const { stderr } = await execAsync(
+        `ffmpeg -i "${audioPath}" -af volumedetect -f null "${nullDevice}"`
+      );
+      const match = stderr.match(/max_volume:\s*([-\d.]+)\s*dB/);
+      if (match) {
+        const maxVolume = parseFloat(match[1]);
+        // DashScope VAD 检测比较严格，使用 -25dB 作为本地预筛阈值
+        if (maxVolume < -25) {
+          throw new Error(`音频内容过于安静（最大音量 ${maxVolume.toFixed(1)} dB），请确保录音时有清晰的说话声，并靠近麦克风`);
+        }
+      }
+    } catch (error: any) {
+      // 只重新抛出我们自己的错误
+      if (error.message?.includes('音频内容过于安静')) {
+        throw error;
+      }
+      // ffmpeg 运行错误忽略，不阻断流程
     }
   }
 

@@ -94,8 +94,8 @@ DATABASE_URL=postgresql://postgres:postgres@localhost:5432/voice_platform
 # Redis (可选)
 REDIS_URL=redis://localhost:6379
 
-# StepFun API
-STEP_API_KEY=2sq3eKLnDbe3UzkwNc60V863mOLumcvYnxptcjUZcBmmQAGrwdiRDMJsWR3pSxgEU
+# DashScope API (CosyVoice-v2)
+DASHSCOPE_API_KEY=your_api_key
 
 # Storage
 STORAGE_TYPE=local

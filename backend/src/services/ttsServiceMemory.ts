@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import voiceService from './voiceServiceMemory';
-import stepfunService from './stepfunService';
+import dashscopeService from './dashscopeService';
 import { memoryStorage } from '../storage/memoryStorage';
 
 const TTS_OUTPUT_DIR = process.env.STORAGE_PATH
@@ -38,12 +38,11 @@ export class TTSService {
       throw new Error('Voice不存在');
     }
 
-    // 2. 调用StepFun生成音频
-    const audioBuffer = await stepfunService.generateSpeech({
-      input: request.input,
-      voice: voice.stepVoiceId,
-      model: request.model,
-    });
+    // 2. 调用 DashScope CosyVoice-v2 生成音频（WebSocket）
+    const audioBuffer = await dashscopeService.generateSpeech(
+      request.input,
+      voice.stepVoiceId  // 存储的是 DashScope voice_id，格式如 "cosyvoice-hum-xxxxx"
+    );
 
     // 3. 保存音频文件
     const timestamp = Date.now();

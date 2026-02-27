@@ -3,7 +3,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import fileService from './fileServiceMemory';
 import embeddingService from './embeddingServiceMemory';
-import stepfunService, { CloneVoiceRequest } from './stepfunService';
+import dashscopeService from './dashscopeService';
 import { memoryStorage, Voice } from '../storage/memoryStorage';
 
 const SAMPLES_DIR = process.env.STORAGE_PATH
@@ -44,29 +44,36 @@ export class VoiceService {
       throw new Error('文件不存在');
     }
 
-    // 3. 创建语音角色（使用随机 embedding，不调用 StepFun）
+    // 3. 调用 DashScope CosyVoice-v3-plus 上传音频并注册音色
+    console.log('[DashScope] 开始音色复刻流程...');
+    const dashscopeVoiceId = await dashscopeService.uploadAndRegisterVoice(
+      file.filePath,
+      'hum' // voice_id 前缀
+    );
+
+    // 4. 创建语音角色，存储 DashScope voice_id
     const voiceId = uuidv4();
     const voice: Voice = {
       id: voiceId,
       userId,
       name: name || undefined,
-      stepVoiceId: `local-${voiceId}`, // 本地生成的 ID
+      stepVoiceId: dashscopeVoiceId, // DashScope voice_id，如 "cosyvoice-hum-xxxxx"
       fileId,
-      model: model || 'codec',
+      model: 'cosyvoice-v3-plus',
       text: text || undefined,
       sampleText: sampleText || undefined,
-      sampleAudioPath: file.filePath, // 使用原始音频文件
+      sampleAudioPath: file.filePath,
       embeddingHash: vectorHash,
-      metadata: { 
-        type: 'codec-model',
-        createdLocally: true 
+      metadata: {
+        type: 'cosyvoice-v3-plus',
+        provider: 'dashscope',
       },
       createdAt: new Date(),
       updatedAt: new Date(),
     };
 
     memoryStorage.saveVoice(voice);
-    console.log('Voice created with random embedding:', voiceId);
+    console.log('[DashScope] 音色创建成功, voiceId:', voiceId, 'dashscopeVoiceId:', dashscopeVoiceId);
     return voice;
   }
 

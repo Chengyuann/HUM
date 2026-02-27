@@ -45,7 +45,7 @@ services:
       PORT: 8000
       DATABASE_URL: postgresql://postgres:postgres@postgres:5432/voice_platform
       REDIS_URL: redis://redis:6379
-      STEP_API_KEY: ${STEP_API_KEY:-}
+      DASHSCOPE_API_KEY: ${DASHSCOPE_API_KEY:-}
       STORAGE_TYPE: local
       STORAGE_PATH: /app/uploads
       EMBEDDING_DIMENSION: 256

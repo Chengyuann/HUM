@@ -57,6 +57,14 @@ router.post('/upload', upload.single('file'), async (req: Request, res: Response
       return sendError(res, '音频时长必须在1-60秒之间', 400);
     }
 
+    // 检测是否有有效人声（防止上传静音到 DashScope）
+    try {
+      await audioPreprocessor.checkVoiceContent(processedFile.path);
+    } catch (error: any) {
+      await fs.unlink(processedFile.path);
+      return sendError(res, error.message, 400);
+    }
+
     // 保存文件信息（不上传到 StepFun，使用本地存储）
     const userId = (req as any).userId || 'default-user';
     const fileMetadata = await fileService.uploadFile(

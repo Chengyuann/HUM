@@ -5,7 +5,7 @@ import path from 'path';
 import pool from '../config/database';
 import fileService from './fileService';
 import embeddingService from './embeddingService';
-import stepfunService, { CloneVoiceRequest } from './stepfunService';
+import dashscopeService from './dashscopeService';
 
 export interface Voice {
   id: string;
@@ -67,44 +67,31 @@ export class VoiceService {
       throw new Error('文件不存在');
     }
 
-    // 3. 调用StepFun复刻音色
-    const stepFileId = file.stepFileId || fileId; // 如果没有stepFileId，使用fileId（实际应该先上传到StepFun）
-    const cloneRequest: CloneVoiceRequest = {
-      fileId: stepFileId,
-      model,
-      text,
-      sampleText,
-    };
+    // 3. 调用 DashScope CosyVoice-v3-plus 上传音频并注册音色
+    console.log('[DashScope] 开始音色复刻流程...');
+    const dashscopeVoiceId = await dashscopeService.uploadAndRegisterVoice(
+      file.filePath,
+      'hum'
+    );
 
-    const cloneResponse = await stepfunService.cloneVoice(cloneRequest);
-
-    // 4. 保存sample音频
-    let sampleAudioPath: string | undefined;
-    if (cloneResponse.sampleAudio) {
-      const voiceId = uuidv4();
-      sampleAudioPath = path.join(SAMPLES_DIR, `${voiceId}.wav`);
-      const audioBuffer = Buffer.from(cloneResponse.sampleAudio, 'base64');
-      await fs.writeFile(sampleAudioPath, audioBuffer);
-    }
-
-    // 5. 保存到数据库
+    // 4. 保存到数据库
     const id = uuidv4();
     const result = await pool.query(
-      `INSERT INTO voices (id, user_id, step_voice_id, file_id, model, text, sample_text, 
+      `INSERT INTO voices (id, user_id, step_voice_id, file_id, model, text, sample_text,
        sample_audio_path, embedding_hash, metadata, created_at, updated_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW(), NOW())
        RETURNING *`,
       [
         id,
         userId,
-        cloneResponse.id,
+        dashscopeVoiceId,  // DashScope voice_id，如 "cosyvoice-hum-xxxxx"
         fileId,
-        model,
+        'cosyvoice-v3-plus',
         text || null,
         sampleText || null,
-        sampleAudioPath || null,
+        file.filePath,      // 使用原始音频作为样本
         vectorHash,
-        JSON.stringify({ duplicated: cloneResponse.duplicated || false }),
+        JSON.stringify({ provider: 'dashscope', type: 'cosyvoice-v3-plus' }),
       ]
     );
 
